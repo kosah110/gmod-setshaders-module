@@ -1,25 +1,25 @@
 # gmod-setshaders-module
 
-A Garry's Mod binary module that restores the ability to modify material shaders at runtime using the stable `IMaterial::SetShaderAndParams()` Source SDK method.
+A Garry's Mod binary module that restores the ability to modify material shaders at runtime using the `IMaterial::SetShaderAndParams()` instead of :SetShaders("") Source SDK method.
 
 ## What is this?
 
-GMod's `IMaterial:SetShader()` was disabled years ago due to crashes, forcing developers to use the limited `CreateMaterial()` workaround which can't modify existing world materials. This module exposes the working `SetShaderAndParams` C++ method, allowing you to change shaders on ANY material - including world brushes - without crashes.
+GMod's `IMaterial:SetShader()` was disabled years ago due to crashes, forcing developers to use `CreateMaterial()` workaround. This module exposes the working `SetShaderAndParams` C++ method, allowing you to change shaders on ANY material including world brushes
 
 ## Features
 
-- ✅ Modify existing materials (including world/brush materials)
-- ✅ Preserve material parameters when changing shaders
-- ✅ No memory duplication like `CreateMaterial()`
-- ✅ Batch material operations with helper functions
-- ✅ Stable - uses existing Source SDK functionality
+- Modify existing materials (including world/brush materials)
+- Preserve material parameters when changing shaders
+- No memory duplication like `CreateMaterial()`
+- Batch material operations with helper functions
+- Uses existing Source SDK functionality
 
 ## Installation
 
 1. Download the compiled module from [Releases](../../releases)
-2. Extract `gmcl_materialshaderex_win32.dll` (or appropriate OS version)
+2. Extract the dlls
 3. Place it in `Steam\steamapps\common\GarrysMod\garrysmod\lua\bin\`
-4. Restart Garry's Mod
+4. Play Garry's Mod
 
 ## Usage
 
@@ -44,7 +44,6 @@ mat:SetShaderAndParams({
     ["$bumpmap"] = "concrete/concrete_wall_normal",
     ["$mraotexture"] = "dev/pbr_mraotexture"
 })
-mat:Recompute()
 ```
 
 **`IMaterial:SetShaderName(string shaderName)`**
@@ -54,7 +53,6 @@ Convenience wrapper that automatically preserves all existing material parameter
 ```lua
 local mat = Material("models/props/chair")
 mat:SetShaderName("PBR") -- Keeps all existing textures/params
-mat:Recompute()
 ```
 
 #### Global Helper Functions
@@ -71,6 +69,38 @@ print("Total materials loaded:", #allMats)
 **`MaterialShaderEx.GetMaterialsByGroup(string groupName)`**
 
 Returns materials filtered by texture group.
+
+```
+// These are given to FindMaterial to reference the texture groups that show up on the 
+#define TEXTURE_GROUP_LIGHTMAP						"Lightmaps"
+#define TEXTURE_GROUP_WORLD							"World textures"
+#define TEXTURE_GROUP_MODEL							"Model textures"
+#define TEXTURE_GROUP_VGUI							"VGUI textures"
+#define TEXTURE_GROUP_PARTICLE						"Particle textures"
+#define TEXTURE_GROUP_DECAL							"Decal textures"
+#define TEXTURE_GROUP_SKYBOX						"SkyBox textures"
+#define TEXTURE_GROUP_CLIENT_EFFECTS				"ClientEffect textures"
+#define TEXTURE_GROUP_OTHER							"Other textures"
+#define TEXTURE_GROUP_PRECACHED						"Precached"				// TODO: assign texture groups to the precached materials
+#define TEXTURE_GROUP_CUBE_MAP						"CubeMap textures"
+#define TEXTURE_GROUP_RENDER_TARGET					"RenderTargets"
+#define TEXTURE_GROUP_UNACCOUNTED					"Unaccounted textures"	// Textures that weren't assigned a texture group.
+//#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER		"Static Vertex"
+#define TEXTURE_GROUP_STATIC_INDEX_BUFFER			"Static Indices"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_DISP		"Displacement Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_COLOR	"Lighting Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_WORLD	"World Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_MODELS	"Model Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_OTHER	"Other Verts"
+#define TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER			"Dynamic Indices"
+#define TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER			"Dynamic Verts"
+#define TEXTURE_GROUP_DEPTH_BUFFER					"DepthBuffer"
+#define TEXTURE_GROUP_VIEW_MODEL					"ViewModel"
+#define TEXTURE_GROUP_PIXEL_SHADERS					"Pixel Shaders"
+#define TEXTURE_GROUP_VERTEX_SHADERS				"Vertex Shaders"
+#define TEXTURE_GROUP_RENDER_TARGET_SURFACE			"RenderTarget Surfaces"
+#define TEXTURE_GROUP_MORPH_TARGETS					"Morph Targets"
+```
 
 ```lua
 -- Get all world/brush materials
@@ -116,7 +146,7 @@ end)
 ## Known Limitations
 
 - **Lightmap seams**: Converting LightmappedGeneric brush materials at runtime may cause lighting seams between brushes. This is because lightmaps are baked by the BSP compiler. A map restart fixes this. May be shader-specific.
-- **Memory limits**: Converting large numbers of materials (100+) at once may cause issues. Use incremental/batch processing for better stability.
+- **Memory limits**: Converting large numbers of materials (100+) at once may freeze or crash the game.
 
 ## Compiling from Source
 
@@ -160,15 +190,15 @@ For more information on compiling GMod binary modules, see the [official wiki](h
 
 ## Use Cases
 
-- 🎨 Runtime shader switching for visual mods
-- 🔧 Shader development and testing
-- 🌍 Dynamic map material modifications
-- 🎮 Graphics quality modes
-- 🛠️ Material editor tools
+- Runtime shader switching for visual mods
+- Shader development and testing
+- Dynamic map material modifications
+- Graphics quality modes
+- Material editor tools
 
 ## Technical Details
 
-- Uses `IMaterial::SetShaderAndParams()` from Source SDK (stable, non-crashing method)
+- Uses `IMaterial::SetShaderAndParams()` from Source SDK 
 - Properly handles all material var types (float, int, string, vector, texture, matrix)
 - Skips internal auto-generated flags to prevent conflicts
 - Includes proper KeyValues memory management
@@ -176,10 +206,6 @@ For more information on compiling GMod binary modules, see the [official wiki](h
 ## Contributing
 
 Issues and pull requests welcome! This is an experimental module, so feedback from the community is valuable.
-
-## License
-
-[MIT License](LICENSE)
 
 ## Credits
 
