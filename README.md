@@ -20,7 +20,8 @@ GMod's `IMaterial:SetShader()` was disabled years ago due to crashes, forcing de
 2. Extract the dlls
 3. Place it in `Steam\steamapps\common\GarrysMod\garrysmod\lua\bin\`
 4. in lua\menu\menu.lua, append require("materialshaderex")
-5. Play Garry's Mod
+5. USE CHROMINUM 32 BIT VERSION, IMPORTANT!!!
+6. Play Garry's Mod
 
 ## Usage
 
